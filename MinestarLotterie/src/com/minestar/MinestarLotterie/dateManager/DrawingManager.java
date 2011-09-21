@@ -40,19 +40,19 @@ public class DrawingManager {
         random = new Random();
     }
 
-    public void addstake(Player player, int[] numbers) {
+    public Boolean addstake(Player player, int[] numbers) {
         String name = player.getName();
         if (currentusers.contains(name)) {
             player.sendMessage("Du kannst nur einmal pro Ziehung einen Tipp abgeben!");
+            return false;
         }
-        else {
-            for (int i = 0; i < numbers.length; i++) {
-                if (!currentdrawing.containsKey(numbers[i]))
-                    currentdrawing.put(numbers[i], new ArrayList<String>());
-                currentdrawing.get(numbers[i]).add(name);
-            }
-            currentusers.add(name);
+        for (int i = 0; i < numbers.length; i++) {
+            if (!currentdrawing.containsKey(numbers[i]))
+                currentdrawing.put(numbers[i], new ArrayList<String>());
+            currentdrawing.get(numbers[i]).add(name);
         }
+        currentusers.add(name);
+        return true;
     }
 
     public Boolean isWinner(Player player) {
@@ -72,8 +72,10 @@ public class DrawingManager {
         for (int i = 0; i < temp.size(); i++) {
             // if(winner.containsKey(temp.get(i)))
             winner.put(temp.get(i), Main.config.getInt("prize_value", 10));
+            Main.log.info("Es gibt einen Gewinner");
         }
         currentdrawing.clear();
+        currentusers.clear();
     }
 
     public void draw(int itemp) {
@@ -88,6 +90,8 @@ public class DrawingManager {
             winner.put(temp.get(i), Main.config.getInt("prize_value", 10));
             Main.log.info("Es gibt einen Gewinner");
         }
+        currentdrawing.clear();
+        currentusers.clear();
     }
 
     public void get(Player player) {
@@ -97,6 +101,7 @@ public class DrawingManager {
                     264), winner.get(name));
             player.getInventory().addItem(itemstack);
             player.sendMessage("Hier dein Gewinn!");
+            winner.remove(player.getName());
             return;
         }
         player.sendMessage("Du hast leider nichts gewonnen");

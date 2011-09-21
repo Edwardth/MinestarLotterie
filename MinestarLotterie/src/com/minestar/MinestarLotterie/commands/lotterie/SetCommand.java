@@ -51,9 +51,16 @@ public class SetCommand extends Command {
                     return;
                 }
             }
-            Main.drawingManager.addstake(player, numbers);
+            if (!Main.drawingManager.addstake(player, numbers))
+                return;
+
+            StringBuilder sb = new StringBuilder("");
+            for (int number : numbers) {
+                sb.append(number);
+                sb.append(", ");
+            }
             player.sendMessage("Dein Tipp wurde erfolgreich abgegeben. "
-                    + numbers);
+                    + sb.substring(0, sb.length() - 2));
             return;
         }
         else {
