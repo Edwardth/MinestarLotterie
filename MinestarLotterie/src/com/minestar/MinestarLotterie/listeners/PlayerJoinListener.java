@@ -31,7 +31,7 @@ public class PlayerJoinListener extends PlayerListener {
         Player player = event.getPlayer();
         if (Main.drawingManager.isWinner(player))
             player.sendMessage(ChatColor.GOLD
-                    + "Herzlichen glückwunsch, du hast in MinestarLotto gewonnen");
+                    + "Herzlichen glÃ¼ckwunsch, du hast in der MinestarLotterie gewonnen");
         // Wenn Player gewonnen hat gekommt er eine Message
     }
 }

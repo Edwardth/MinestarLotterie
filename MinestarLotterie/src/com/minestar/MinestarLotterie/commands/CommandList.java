@@ -18,6 +18,7 @@
 
 package com.minestar.MinestarLotterie.commands;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map.Entry;
@@ -62,12 +63,18 @@ public class CommandList {
             return;
 
         Player player = (Player) sender;
-
         if (!label.startsWith("/"))
             label = "/" + label;
-
+        label = label.toLowerCase();
+        if(!label.equals("/lotterie")||args.length == 0)
+        {
+            player.sendMessage("Problem1");
+            return;
+        }
         // looking for
-        Command cmd = commandList.get(label + "_" + args.length);
+        label = args[0];
+        args = Arrays.copyOfRange(args, 1, args.length);
+        Command cmd = commandList.get(label + "_" + (args.length));
         if (cmd != null)
             cmd.run(args, player);
         else {

@@ -72,40 +72,6 @@ public class Main extends JavaPlugin {
         return true;
     }
 
-    /*
-     * @Override public boolean onCommand(CommandSender sender, Command command,
-     * String label, String[] args) { if (sender instanceof Player) { Player
-     * player = (Player) sender; if (args.length > 0) { if
-     * (args[0].toLowerCase().equals("set")) { int drawings =
-     * config.getInt("drawing_of_lots", 1); int range =
-     * config.getInt("range_of_numbers", 9); if (args.length == drawings + 1) {
-     * int[] numbers = new int[drawings]; for (int i = 0; i < drawings; i++) {
-     * try { numbers[i] = Integer.parseInt(args[i + 1]); } catch (Exception e) {
-     * player.sendMessage("Der " + (i + 1) + ". Parameter ist keine Zahl!");
-     * return true; } if (numbers[i] < 1 || numbers[i] > range) {
-     * player.sendMessage("Die Zahlen muessen zwischen 1 und " + range +
-     * " sein"); return true; } } drawingManager.addstake(player, numbers);
-     * player.sendMessage("Dein Tipp wurde erfolgreich abgegeben. " + numbers);
-     * return true; // Übergabe der Zahlen und des Spielers an die // Datenbank.
-     * } else { player.sendMessage("Bitte geben Sie " + drawings +
-     * "Zahlen an."); return true; } } else { if
-     * (args[0].toLowerCase().equals("get")) { // Zurückgabe es womöglichen
-     * Gewinns. drawingManager.get(player); return true; } else { if
-     * (args[0].toLowerCase().equals("drawing")) { if (player.isOp()) { //
-     * Drawing Befehl ausführen. if (args.length == 2)
-     * drawingManager.draw(Integer.parseInt(args[1])); drawingManager.draw(); }
-     * else {
-     * player.sendMessage("Du bist nicht berechtigt diesen Befehl auszufuehren!"
-     * ); } return true; } else {
-     * player.sendMessage("Von diesen Befehl wuste ich noch gar nichts :D");
-     * return true; } } } } else { player.sendMessage(ChatColor.GREEN +
-     * "/msl set [Zahlen]" + ChatColor.WHITE + " Um Lottoschein auszufüllen");
-     * player.sendMessage(ChatColor.GREEN + "/msl get" + ChatColor.WHITE +
-     * " Um womöglichen Gewinn abzuholen"); return true; } }
-     * sender.sendMessage("Nur Spieler können diesen Befehl ausführen"); return
-     * true; }
-     */
-
     public void createConfig() {
         config.setProperty("drawing_of_lots", 1);
         config.setProperty("range_of_numbers", 9);

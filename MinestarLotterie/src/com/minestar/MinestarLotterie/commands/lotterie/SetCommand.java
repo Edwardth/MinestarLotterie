@@ -34,11 +34,11 @@ public class SetCommand extends Command {
     public void execute(String[] args, Player player) {
         int drawings = Main.config.getInt("drawing_of_lots", 1);
         int range = Main.config.getInt("range_of_numbers", 9);
-        if (args.length == drawings + 1) {
+        if (args.length == drawings) {
             int[] numbers = new int[drawings];
             for (int i = 0; i < drawings; i++) {
                 try {
-                    numbers[i] = Integer.parseInt(args[i + 1]);
+                    numbers[i] = Integer.parseInt(args[i]);
                 }
                 catch (Exception e) {
                     player.sendMessage("Der " + (i + 1)

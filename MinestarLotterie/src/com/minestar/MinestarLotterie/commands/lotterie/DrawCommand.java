@@ -33,9 +33,9 @@ public class DrawCommand extends Command {
 
     public void execute(String[] args, Player player) {
         if (player.isOp()) {
-            // Drawing Befehl ausführen.
-            if (args.length == 2)
-                Main.drawingManager.draw(Integer.parseInt(args[1]));
+            // Drawing Befehl ausfÃ¼hren.
+            if (args.length == 1)
+                Main.drawingManager.draw(Integer.parseInt(args[0]));
             Main.drawingManager.draw();
         }
         else {
