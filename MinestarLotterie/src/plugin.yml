@@ -1,0 +1,7 @@
+name: MinestarLotterie
+main: com.minestar.MinestarLotterie.Main
+version: 1.0
+commands:
+  lotterie:
+    description: Use the MinestarLotterie
+    usage: /lotterie
