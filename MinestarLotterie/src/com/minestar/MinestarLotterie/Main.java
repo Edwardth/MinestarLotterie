@@ -21,6 +21,7 @@ package com.minestar.MinestarLotterie;
 import java.io.File;
 import java.util.logging.Logger;
 
+import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event.Priority;
@@ -38,12 +39,14 @@ public class Main extends JavaPlugin {
     public static DrawingManager drawingManager;
     public static Configuration config;
     private CommandList commandList;
+    public static Server server;
 
     public void onEnable() {
         log.info("[MinestarLotterie] enabled");
         drawingManager = new DrawingManager();
         commandList = new CommandList(getServer());
-        getServer().getPluginManager().registerEvent(Type.PLAYER_JOIN,
+        server = getServer();
+        server.getPluginManager().registerEvent(Type.PLAYER_JOIN,
                 new PlayerJoinListener(), Priority.Normal, this);
         loadConfig();
     }

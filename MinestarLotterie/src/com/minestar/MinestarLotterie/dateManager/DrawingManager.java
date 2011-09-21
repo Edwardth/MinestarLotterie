@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.TreeMap;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -62,20 +63,8 @@ public class DrawingManager {
     }
 
     public void draw() {
-        ArrayList<String> temp = new ArrayList<String>();
         int itemp = random.nextInt(10);
-        if (!currentdrawing.containsKey(itemp))
-            return;
-        temp = currentdrawing.get(itemp);
-        if (temp.isEmpty())
-            return;
-        for (int i = 0; i < temp.size(); i++) {
-            // if(winner.containsKey(temp.get(i)))
-            winner.put(temp.get(i), Main.config.getInt("prize_value", 10));
-            Main.log.info("Es gibt einen Gewinner");
-        }
-        currentdrawing.clear();
-        currentusers.clear();
+        draw(itemp);
     }
 
     public void draw(int itemp) {
@@ -85,10 +74,15 @@ public class DrawingManager {
         temp = currentdrawing.get(itemp);
         if (temp.isEmpty())
             return;
+        Player player;
         for (int i = 0; i < temp.size(); i++) {
             // if(winner.containsKey(temp.get(i)))
             winner.put(temp.get(i), Main.config.getInt("prize_value", 10));
             Main.log.info("Es gibt einen Gewinner");
+            player = Main.server.getPlayer(temp.get(i));
+            if (player != null)
+                player.sendMessage(ChatColor.GOLD
+                        + "Du hast in der MinestarLotterie gewonnen!");
         }
         currentdrawing.clear();
         currentusers.clear();
