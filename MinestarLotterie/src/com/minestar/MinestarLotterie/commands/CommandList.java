@@ -51,7 +51,8 @@ public class CommandList {
         Command[] commands = new Command[] {
                 new SetCommand("set", "<Zahl>", "set", server),
                 new GetCommand("get", "", "get", server),
-                new DrawCommand("draw", "<Nummer>", "draw", server) };
+                new DrawCommand("draw", "<Nummer>", "draw", server),
+                new DrawCommand("draw", "", "draw", server) };
 
         // store the commands in the hash map
         initCommandList(commands);

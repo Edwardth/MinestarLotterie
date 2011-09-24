@@ -45,7 +45,7 @@ public class DrawingManager {
         random = new Random();
     }
 
-    public Boolean addstake(Player player, int[] numbers) {
+    public boolean addstake(Player player, int[] numbers) {
         String name = player.getName();
         if (currentusers.contains(name)) {
             player.sendMessage("Du kannst nur einmal pro Ziehung einen Tipp abgeben!");
@@ -54,8 +54,9 @@ public class DrawingManager {
         for (int i = 0; i < numbers.length; i++) {
             if (!currentdrawing.containsKey(numbers[i])) {
                 if (dbManager.addStakes(numbers[i], name)) {
-                    currentdrawing.put(numbers[i], new ArrayList<String>());
-                    currentdrawing.get(numbers[i]).add(name);
+                    ArrayList<String> temp = new ArrayList<String>();
+                    temp.add(name);
+                    currentdrawing.put(numbers[i], temp);
                 }
             }
             else {
@@ -69,10 +70,8 @@ public class DrawingManager {
         return true;
     }
 
-    public Boolean isWinner(Player player) {
-        if (winner.containsKey(player.getName()))
-            return true;
-        return false;
+    public boolean isWinner(Player player) {
+        return winner.containsKey(player.getName());
     }
 
     public void draw() {
@@ -133,7 +132,7 @@ public class DrawingManager {
         player.sendMessage("Du hast leider nichts gewonnen");
     }
 
-    String playersToString(ArrayList<String> players, String player) {
+    private String playersToString(ArrayList<String> players, String player) {
         StringBuilder sb = new StringBuilder("");
         for (int i = 0; i < players.size(); i++) {
             sb.append(players.get(i));
