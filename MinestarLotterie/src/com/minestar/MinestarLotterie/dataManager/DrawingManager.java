@@ -52,9 +52,18 @@ public class DrawingManager {
             return false;
         }
         for (int i = 0; i < numbers.length; i++) {
-            if (!currentdrawing.containsKey(numbers[i]))
-                currentdrawing.put(numbers[i], new ArrayList<String>());
-            currentdrawing.get(numbers[i]).add(name);
+            if (!currentdrawing.containsKey(numbers[i])) {
+                if (dbManager.addStakes(numbers[i], name)) {
+                    currentdrawing.put(numbers[i], new ArrayList<String>());
+                    currentdrawing.get(numbers[i]).add(name);
+                }
+            }
+            else {
+                if (dbManager.updateStakes(numbers[i],
+                        playersToString(currentdrawing.get(numbers[i]), name))) {
+                    currentdrawing.get(numbers[i]).add(name);
+                }
+            }
         }
         currentusers.add(name);
         return true;
@@ -101,8 +110,10 @@ public class DrawingManager {
                 }
             }
         }
-        currentdrawing.clear();
-        currentusers.clear();
+        if (dbManager.deleteStakes()) {
+            currentdrawing.clear();
+            currentusers.clear();
+        }
     }
 
     public void get(Player player) {
@@ -120,5 +131,15 @@ public class DrawingManager {
                     + "Fehler bei deleteWinner bitte wende dich an einen Admin");
         }
         player.sendMessage("Du hast leider nichts gewonnen");
+    }
+
+    String playersToString(ArrayList<String> players, String player) {
+        StringBuilder sb = new StringBuilder("");
+        for (int i = 0; i < players.size(); i++) {
+            sb.append(players.get(i));
+            sb.append(",");
+        }
+        sb.append(player);
+        return sb.toString();
     }
 }
