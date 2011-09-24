@@ -29,8 +29,10 @@ import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 
+import com.minestar.MinestarLotterie.dataManager.ConnectionManager;
+import com.minestar.MinestarLotterie.dataManager.DatabaseManager;
+import com.minestar.MinestarLotterie.dataManager.DrawingManager;
 import com.minestar.MinestarLotterie.commands.CommandList;
-import com.minestar.MinestarLotterie.dateManager.DrawingManager;
 import com.minestar.MinestarLotterie.listeners.PlayerJoinListener;
 
 public class Main extends JavaPlugin {
@@ -42,13 +44,19 @@ public class Main extends JavaPlugin {
     public static Server server;
 
     public void onEnable() {
-        log.info("[MinestarLotterie] enabled");
-        drawingManager = new DrawingManager();
-        commandList = new CommandList(getServer());
-        server = getServer();
-        server.getPluginManager().registerEvent(Type.PLAYER_JOIN,
-                new PlayerJoinListener(), Priority.Normal, this);
-        loadConfig();
+        if (ConnectionManager.initialize()) {
+            DatabaseManager dbManager = new DatabaseManager(getServer());
+            drawingManager = new DrawingManager(dbManager);
+            commandList = new CommandList(getServer());
+            server = getServer();
+            server.getPluginManager().registerEvent(Type.PLAYER_JOIN,
+                    new PlayerJoinListener(), Priority.Normal, this);
+            loadConfig();
+            log.info("[MinestarLotterie] enabled");
+        }
+        else {
+            log.warning("Can't connect to Database!");
+        }
     }
 
     public void onDisable() {

@@ -16,7 +16,7 @@
  * along with MinestarLotterie.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.minestar.MinestarLotterie.dateManager;
+package com.minestar.MinestarLotterie.dataManager;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -26,18 +26,22 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.minestar.MinestarLotterie.dataManager.DatabaseManager;
 import com.minestar.MinestarLotterie.Main;
 
 public class DrawingManager {
+    private final DatabaseManager dbManager;
     private ArrayList<String> currentusers;
     private TreeMap<Integer, ArrayList<String>> currentdrawing;
     private TreeMap<String, Integer> winner;
     private Random random;
 
-    public DrawingManager() {
-        currentusers = new ArrayList<String>();
-        currentdrawing = new TreeMap<Integer, ArrayList<String>>();
-        winner = new TreeMap<String, Integer>();
+    public DrawingManager(DatabaseManager dbManager) {
+        this.dbManager = dbManager;
+        StakesAndPlayer sap = this.dbManager.loadStakesAndPlayerFromDatabase();
+        currentusers = sap.getPlayer();
+        currentdrawing = sap.getStakes();
+        winner = this.dbManager.loadWinnerFromDatabase();
         random = new Random();
     }
 
@@ -69,6 +73,7 @@ public class DrawingManager {
 
     public void draw(int itemp) {
         ArrayList<String> temp = new ArrayList<String>();
+        int prize = Main.config.getInt("prize_value", 10);
         if (!currentdrawing.containsKey(itemp))
             return;
         temp = currentdrawing.get(itemp);
@@ -76,13 +81,25 @@ public class DrawingManager {
             return;
         Player player;
         for (int i = 0; i < temp.size(); i++) {
-            // if(winner.containsKey(temp.get(i)))
-            winner.put(temp.get(i), Main.config.getInt("prize_value", 10));
-            Main.log.info("Es gibt einen Gewinner");
-            player = Main.server.getPlayer(temp.get(i));
-            if (player != null)
-                player.sendMessage(ChatColor.GOLD
-                        + "Du hast in der MinestarLotterie gewonnen!");
+            if (winner.containsKey(temp.get(i))) {
+                int oldprize = winner.get(temp.get(i));
+                if (dbManager.updateWinner(temp.get(i), prize + oldprize)) {
+                    winner.put(temp.get(i), prize + oldprize);
+                    player = Main.server.getPlayer(temp.get(i));
+                    if (player != null)
+                        player.sendMessage(ChatColor.GOLD
+                                + "Du hast wieder in der MinestarLotterie gewonnen!");
+                }
+            }
+            else {
+                if (dbManager.addWinner(temp.get(i), prize)) {
+                    winner.put(temp.get(i), prize);
+                    player = Main.server.getPlayer(temp.get(i));
+                    if (player != null)
+                        player.sendMessage(ChatColor.GOLD
+                                + "Du hast in der MinestarLotterie gewonnen!");
+                }
+            }
         }
         currentdrawing.clear();
         currentusers.clear();
@@ -91,12 +108,16 @@ public class DrawingManager {
     public void get(Player player) {
         String name = player.getName();
         if (isWinner(player)) {
-            ItemStack itemstack = new ItemStack(Main.config.getInt("prize_ID",
-                    264), winner.get(name));
-            player.getInventory().addItem(itemstack);
-            player.sendMessage("Hier dein Gewinn!");
-            winner.remove(player.getName());
-            return;
+            if (dbManager.deleteWinner(player.getName())) {
+                ItemStack itemstack = new ItemStack(Main.config.getInt(
+                        "prize_ID", 264), winner.get(name));
+                player.getInventory().addItem(itemstack);
+                player.sendMessage("Hier dein Gewinn!");
+                winner.remove(player.getName());
+                return;
+            }
+            player.sendMessage(ChatColor.RED
+                    + "Fehler bei deleteWinner bitte wende dich an einen Admin");
         }
         player.sendMessage("Du hast leider nichts gewonnen");
     }

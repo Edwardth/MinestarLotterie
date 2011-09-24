@@ -27,11 +27,11 @@ public abstract class Command {
 
     // Add this in every command to add an description
     protected String description = "";
-    // Example : /warp create
+    // Example : /lotterie set
     private String syntax;
     // Example : <Name>
     private String arguments;
-    // Example : minestarwarp.create
+    // Example : minestarlotterie.set
     private String permissionNode;
 
     private final int argumentCount;
@@ -40,11 +40,11 @@ public abstract class Command {
      * Just call super() in the inhertited classes. <br>
      * 
      * @param syntax
-     *            Example : /warp create
+     *            Example : /lotterie set
      * @param arguments
      *            Example : <Name>
      * @param node
-     *            Example : minestarwarp.create
+     *            Example : minestarlotterie.set
      */
     public Command(String syntax, String arguments, String node, Server server) {
         this.syntax = syntax;
@@ -126,7 +126,7 @@ public abstract class Command {
     }
 
     /**
-     * @return The permission node, like minestarwarp.create
+     * @return The permission node, like minestarlotterie.set
      */
     public String getPermissionNode() {
         return permissionNode;
