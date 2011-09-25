@@ -37,6 +37,7 @@ public class DrawCommand extends Command {
             if (args.length == 1)
                 Main.drawingManager.draw(Integer.parseInt(args[0]));
             Main.drawingManager.draw();
+            player.sendMessage("Manuelle Ziehung war erfolgreich.");
         }
         else {
             player.sendMessage("Du bist nicht berechtigt diesen Befehl auszufuehren!");

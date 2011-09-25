@@ -82,30 +82,30 @@ public class DrawingManager {
     public void draw(int itemp) {
         ArrayList<String> temp = new ArrayList<String>();
         int prize = Main.config.getInt("prize_value", 10);
-        if (!currentdrawing.containsKey(itemp))
-            return;
-        temp = currentdrawing.get(itemp);
-        if (temp.isEmpty())
-            return;
-        Player player;
-        for (int i = 0; i < temp.size(); i++) {
-            if (winner.containsKey(temp.get(i))) {
-                int oldprize = winner.get(temp.get(i));
-                if (dbManager.updateWinner(temp.get(i), prize + oldprize)) {
-                    winner.put(temp.get(i), prize + oldprize);
-                    player = Main.server.getPlayer(temp.get(i));
-                    if (player != null)
-                        player.sendMessage(ChatColor.GOLD
-                                + "Du hast wieder in der MinestarLotterie gewonnen!");
+        if (currentdrawing.containsKey(itemp)) {
+            temp = currentdrawing.get(itemp);
+            if (temp.isEmpty())
+                return;
+            Player player;
+            for (int i = 0; i < temp.size(); i++) {
+                if (winner.containsKey(temp.get(i))) {
+                    int oldprize = winner.get(temp.get(i));
+                    if (dbManager.updateWinner(temp.get(i), prize + oldprize)) {
+                        winner.put(temp.get(i), prize + oldprize);
+                        player = Main.server.getPlayer(temp.get(i));
+                        if (player != null)
+                            player.sendMessage(ChatColor.GOLD
+                                    + "Du hast wieder in der MinestarLotterie gewonnen!");
+                    }
                 }
-            }
-            else {
-                if (dbManager.addWinner(temp.get(i), prize)) {
-                    winner.put(temp.get(i), prize);
-                    player = Main.server.getPlayer(temp.get(i));
-                    if (player != null)
-                        player.sendMessage(ChatColor.GOLD
-                                + "Du hast in der MinestarLotterie gewonnen!");
+                else {
+                    if (dbManager.addWinner(temp.get(i), prize)) {
+                        winner.put(temp.get(i), prize);
+                        player = Main.server.getPlayer(temp.get(i));
+                        if (player != null)
+                            player.sendMessage(ChatColor.GOLD
+                                    + "Du hast in der MinestarLotterie gewonnen!");
+                    }
                 }
             }
         }
