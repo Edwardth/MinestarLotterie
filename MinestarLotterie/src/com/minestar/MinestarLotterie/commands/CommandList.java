@@ -68,7 +68,7 @@ public class CommandList {
             label = "/" + label;
         label = label.toLowerCase();
         if (!label.equals("/lotterie") || args.length == 0) {
-            player.sendMessage("Problem1");
+            player.sendMessage("Problem!");
             return;
         }
         // looking for

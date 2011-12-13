@@ -32,26 +32,27 @@ import com.minestar.MinestarLotterie.Main;
 public class DrawingManager {
     private final DatabaseManager dbManager;
     private ArrayList<String> currentusers;
-    private TreeMap<Integer, ArrayList<String>> currentdrawing;
+    //private TreeMap<Integer, ArrayList<String>> currentdrawing;
     private TreeMap<String, Integer> winner;
     private Random random;
 
     public DrawingManager(DatabaseManager dbManager) {
         this.dbManager = dbManager;
-        StakesAndPlayer sap = this.dbManager.loadStakesAndPlayerFromDatabase();
-        currentusers = sap.getPlayer();
-        currentdrawing = sap.getStakes();
+        //StakesAndPlayer sap = this.dbManager.loadStakesAndPlayerFromDatabase();
+        //currentusers = sap.getPlayer();
+        //currentdrawing = sap.getStakes();
         winner = this.dbManager.loadWinnerFromDatabase();
         random = new Random();
     }
 
-    public boolean addstake(Player player, int[] numbers) {
+    public boolean addstake(Player player, int number) {
         String name = player.getName();
         if (currentusers.contains(name)) {
             player.sendMessage("Du kannst nur einmal pro Ziehung einen Tipp abgeben!");
             return false;
         }
-        for (int i = 0; i < numbers.length; i++) {
+        dbManager.addStake(name, number);
+        /*for (int i = 0; i < numbers.length; i++) {
             if (!currentdrawing.containsKey(numbers[i])) {
                 if (dbManager.addStakes(numbers[i], name)) {
                     ArrayList<String> temp = new ArrayList<String>();
@@ -65,7 +66,7 @@ public class DrawingManager {
                     currentdrawing.get(numbers[i]).add(name);
                 }
             }
-        }
+        }*/
         currentusers.add(name);
         return true;
     }
@@ -74,13 +75,13 @@ public class DrawingManager {
         return winner.containsKey(player.getName());
     }
 
-    public void draw() {
+    public void draw(boolean auto) {
         int itemp = random.nextInt(10);
-        draw(itemp);
+        draw(itemp,auto);
     }
 
-    public void draw(int itemp) {
-        ArrayList<String> temp = new ArrayList<String>();
+    public void draw(int itemp,boolean auto) {
+        /*ArrayList<String> temp = new ArrayList<String>();
         int prize = Main.config.getInt("prize_value", 10);
         if (currentdrawing.containsKey(itemp)) {
             temp = currentdrawing.get(itemp);
@@ -112,7 +113,7 @@ public class DrawingManager {
         if (dbManager.deleteStakes()) {
             currentdrawing.clear();
             currentusers.clear();
-        }
+        }*/
     }
 
     public void get(Player player) {
@@ -132,7 +133,7 @@ public class DrawingManager {
         player.sendMessage("Du hast leider nichts gewonnen");
     }
 
-    private String playersToString(ArrayList<String> players, String player) {
+    /*private String playersToString(ArrayList<String> players, String player) {
         StringBuilder sb = new StringBuilder("");
         for (int i = 0; i < players.size(); i++) {
             sb.append(players.get(i));
@@ -140,5 +141,5 @@ public class DrawingManager {
         }
         sb.append(player);
         return sb.toString();
-    }
+    }*/
 }

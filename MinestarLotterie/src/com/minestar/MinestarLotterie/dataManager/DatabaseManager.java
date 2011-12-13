@@ -21,8 +21,9 @@ package com.minestar.MinestarLotterie.dataManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Date;
 import java.util.TreeMap;
-import java.util.ArrayList;
+//import java.util.ArrayList;
 
 import org.bukkit.Server;
 
@@ -36,12 +37,13 @@ public class DatabaseManager {
     // private final Server server;
 
     // PreparedStatements for the often used SQLLite Queries.
-    private PreparedStatement addStakes = null;
-    private PreparedStatement updateStakes = null;
+    private PreparedStatement addStake = null;
+    // private PreparedStatement updateStakes = null;
     private PreparedStatement deleteStakes = null;
     private PreparedStatement addWinner = null;
     private PreparedStatement updateWinner = null;
     private PreparedStatement deleteWinner = null;
+    private PreparedStatement addDrawing = null;
 
     /**
      * Uses for all database transactions
@@ -53,10 +55,17 @@ public class DatabaseManager {
         try {
             // create tables if not exists and compile the prepare Statements
             initiate();
-            addStakes = con
-                    .prepareStatement("INSERT INTO stakes (id, players) VALUES (?,?);");
-            updateStakes = con
-                    .prepareStatement("UPDATE stakes SET players = ? WHERE id = ?;");
+            /*
+             * addStakes = con
+             * .prepareStatement("INSERT INTO stakes (id, players) VALUES (?,?);"
+             * );
+             */
+            addStake = con
+                    .prepareStatement("INSERT INTO stakes (player, number) VALUES (?,?);");
+            /*
+             * updateStakes = con
+             * .prepareStatement("UPDATE stakes SET players = ? WHERE id = ?;");
+             */
             deleteStakes = con.prepareStatement("DELETE FROM stakes;");
             addWinner = con
                     .prepareStatement("INSERT INTO winner (player, value) VALUES (?,?);");
@@ -64,9 +73,11 @@ public class DatabaseManager {
                     .prepareStatement("UPDATE winner SET value = ? WHERE player = ?;");
             deleteWinner = con
                     .prepareStatement("DELETE FROM winner WHERE player = ?;");
+            addDrawing = con
+                    .prepareStatement("INSERT INTO draws (time, number, auto, winner) VALUES (?,?,?,?);");
         }
         catch (Exception e) {
-            Main.log.warning("Error while initiate of DatabaseManager!");
+            Main.log.printError("Error while initiate of DatabaseManager!", e);
         }
     }
 
@@ -79,14 +90,33 @@ public class DatabaseManager {
         // create the table for storing the stakes.
         con.createStatement().executeUpdate(
                 "CREATE TABLE IF NOT EXISTS `stakes` ("
-                        + "`id` INTEGER PRIMARY KEY,"
-                        + "`players` text DEFAULT '');");
+                        + "`player` varchar(32) PRIMARY KEY,"
+                        + "`number` INTEGER NOT NULL DEFAULT '0');");
+        /*
+         * con.createStatement().executeUpdate(
+         * "CREATE TABLE IF NOT EXISTS `stakes` (" + "`id` INTEGER PRIMARY KEY,"
+         * + "`players` text DEFAULT '');");
+         */
 
         // create the table for storing the winner.
         con.createStatement().executeUpdate(
                 "CREATE TABLE IF NOT EXISTS `winner` ("
                         + "`player` varchar(32) PRIMARY KEY,"
                         + "`value` INTEGER NOT NULL DEFAULT '0');");
+        // create the table for storing the draws.
+        con.createStatement().executeUpdate(
+                "CREATE TABLE IF NOT EXISTS `draws` ("
+                        + "`id` INTEGER PRIMARY KEY,"
+                        + "`time` LONG NOT NULL DEFAULT '0',"
+                        + "`number` INTEGER NOT NULL DEFAULT '0',"
+                        + "`auto` BOOLEAN DEFAULT TRUE,"
+                        + "`winner` text);");
+        // create the table for storing the next draw-time.
+        con.createStatement().executeUpdate(
+                "CREATE TABLE IF NOT EXISTS `nextdraw` ("
+                        + "`id` INTEGER PRIMARY KEY,"
+                        + "`time` LONG NOT NULL DEFAULT '0',"
+                        + "`price` INT NOT NULL DEFAULT '0');");
         con.commit();
     }
 
@@ -104,13 +134,44 @@ public class DatabaseManager {
             }
         }
         catch (Exception e) {
-            Main.log.warning("Error while loading the winner from database!");
+            Main.log.printError(
+                    "Error while loading the winner from database!", e);
         }
-        Main.log.info("Loaded sucessfully " + winner.size() + " Winner");
+        Main.log.printInfo("Loaded sucessfully " + winner.size() + " Winner");
         return winner;
     }
 
-    public StakesAndPlayer loadStakesAndPlayerFromDatabase() {
+    /*public long loadNextDraw() {
+        try {
+            ResultSet rs = con.createStatement().executeQuery(
+                    "SELCET time FROM nextdraw");
+            while (rs.next()) {
+                return rs.getLong(2);
+            }
+        }
+        catch (Exception e) {
+            Main.log.printError(
+                    "Error while loading the nextdraw from database!", e);
+        }
+        return 0;
+    }*/
+
+    public long loadTime() {
+        long time = 0;
+        try {
+            ResultSet rs = con.createStatement().executeQuery(
+                    "SELECT time FROM nextdraw WHERE id='1'");
+            if (rs.next())
+                time = rs.getLong(1);
+        }
+        catch (Exception e) {
+            Main.log.printError("Error while loading the time from database!",
+                    e);
+        }
+        return time;
+    }
+
+    /*public StakesAndPlayer loadStakesAndPlayerFromDatabase() {
         TreeMap<Integer, ArrayList<String>> tree = new TreeMap<Integer, ArrayList<String>>();
         ArrayList<String> player = new ArrayList<String>();
         try {
@@ -129,43 +190,45 @@ public class DatabaseManager {
             }
         }
         catch (Exception e) {
-            Main.log.warning("Error while loading the winner from database!");
+            Main.log.printError(
+                    "Error while loading the stakes and Players from database!", e);
         }
-        Main.log.info("Loaded sucessfully " + tree.size() + " Stakes");
-        Main.log.info("Loaded sucessfully " + player.size() + " Player");
+        Main.log.printInfo("Loaded sucessfully " + tree.size() + " Stakes");
+        Main.log.printInfo("Loaded sucessfully " + player.size() + " Player");
         StakesAndPlayer sap = new StakesAndPlayer(tree, player);
         return sap;
     }
+    */
 
-    public boolean addStakes(int id, String players) {
+    public boolean addStake(String player, int number) {
         try {
-            // INSERT INTO stakes (id, players) VALUES (?,?);
-            addStakes.setInt(1, id);
-            addStakes.setString(2, players);
-            addStakes.executeUpdate();
+            /*
+             * // INSERT INTO stakes (id, players) VALUES (?,?);
+             * addStakes.setInt(1, id); addStakes.setString(2, players);
+             * addStakes.executeUpdate(); con.commit();
+             */
+            // INSERT INTO stakes (player, number) VALUES (?,?);
+            addStake.setString(1, player);
+            addStake.setInt(2, number);
+            addStake.executeUpdate();
             con.commit();
         }
         catch (Exception e) {
-            Main.log.warning("Error wihile adding a new stake to database!");
+            Main.log.printError("Error wihile adding a new stake to database!",
+                    e);
             return false;
         }
         return true;
     }
 
-    public boolean updateStakes(int id, String players) {
-        try {
-            // UPDATE stakes SET players = ? WHERE id = ?;
-            updateStakes.setString(1, players);
-            updateStakes.setInt(2, id);
-            updateStakes.executeUpdate();
-            con.commit();
-        }
-        catch (Exception e) {
-            Main.log.warning("Error while updateing stakes!");
-            return false;
-        }
-        return true;
-    }
+    /*
+     * public boolean updateStakes(int id, String players) { try { // UPDATE
+     * stakes SET players = ? WHERE id = ?; updateStakes.setString(1, players);
+     * updateStakes.setInt(2, id); updateStakes.executeUpdate(); con.commit(); }
+     * catch (Exception e) {
+     * Main.log.printError("Error while updateing stakes!", e); return false; }
+     * return true; }
+     */
 
     public boolean deleteStakes() {
         try {
@@ -174,7 +237,8 @@ public class DatabaseManager {
             con.commit();
         }
         catch (Exception e) {
-            Main.log.warning("Error while deleting stakes!");
+            Main.log.printError("Error while deleting stakes!", e);
+            return false;
         }
         return true;
     }
@@ -188,7 +252,8 @@ public class DatabaseManager {
             con.commit();
         }
         catch (Exception e) {
-            Main.log.warning("Error while adding a new winner to database!");
+            Main.log.printError("Error while adding a new winner to database!",
+                    e);
             return false;
         }
         return true;
@@ -203,7 +268,7 @@ public class DatabaseManager {
             con.commit();
         }
         catch (Exception e) {
-            Main.log.warning("Error while updateing a winner!");
+            Main.log.printError("Error while updateing a winner!", e);
             return false;
         }
         return true;
@@ -217,6 +282,25 @@ public class DatabaseManager {
             con.commit();
         }
         catch (Exception e) {
+            Main.log.printError("Error while deleting a winner", e);
+            return false;
+        }
+        return true;
+    }
+
+    public boolean addDrawing(int number, boolean auto, String winner) {
+        try {
+            // INSERT INTO draws (time, number, auto, winner) VALUES (?,?,?,?);
+            Date date = new Date();
+            addDrawing.setLong(1, date.getTime());
+            addDrawing.setInt(2, number);
+            addDrawing.setBoolean(3, auto);
+            addDrawing.setString(4, winner);
+            addDrawing.executeUpdate();
+            con.commit();
+        }
+        catch (Exception e) {
+            Main.log.printError("Error while adding a draw!", e);
             return false;
         }
         return true;

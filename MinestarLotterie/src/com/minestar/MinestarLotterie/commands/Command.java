@@ -22,6 +22,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 
+import com.gemo.utils.UtilPermissions;
+
 public abstract class Command {
     public final Server server;
 
@@ -84,6 +86,17 @@ public abstract class Command {
      */
     public abstract void execute(String[] args, Player player);
 
+    /**
+     * @param player
+     *            The command caller
+     * @return True when the player has enough rights to use the command
+     */
+    protected boolean hasRights(Player player) {
+        return UtilPermissions.playerCanUseCommand(player,
+                "minestarlotterie.command." + getPermissionNode());
+    }
+    
+    
     /**
      * Compares the count of arguments has and the count of arguments the
      * command should have.

@@ -19,7 +19,9 @@
 package com.minestar.MinestarLotterie;
 
 import java.io.File;
-import java.util.logging.Logger;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Timer;
 
 import org.bukkit.Server;
 import org.bukkit.command.Command;
@@ -34,33 +36,44 @@ import com.minestar.MinestarLotterie.dataManager.DatabaseManager;
 import com.minestar.MinestarLotterie.dataManager.DrawingManager;
 import com.minestar.MinestarLotterie.commands.CommandList;
 import com.minestar.MinestarLotterie.listeners.PlayerJoinListener;
+import com.minestar.MinestarLotterie.utils.LogUnit;
+import com.minestar.MinestarLotterie.utils.LotterieTask;
 
 public class Main extends JavaPlugin {
 
-    public static Logger log = Logger.getLogger("Minecraft");
+    private static final String PLUGIN_NAME = "MinestarLotterie";
+    public static LogUnit log = LogUnit.getInstance(PLUGIN_NAME);
+    private DatabaseManager dbManager;
     public static DrawingManager drawingManager;
     public static Configuration config;
     private CommandList commandList;
     public static Server server;
+    Timer t;
+    LotterieTask task;
 
     public void onEnable() {
         if (ConnectionManager.initialize()) {
-            DatabaseManager dbManager = new DatabaseManager(getServer());
+            dbManager = new DatabaseManager(getServer());
             drawingManager = new DrawingManager(dbManager);
             commandList = new CommandList(getServer());
             server = getServer();
             server.getPluginManager().registerEvent(Type.PLAYER_JOIN,
                     new PlayerJoinListener(), Priority.Normal, this);
             loadConfig();
-            log.info("[MinestarLotterie] enabled");
+            log.printInfo("enabled");
+            if (config.getBoolean("automatically_drawing", true)) {
+                t = new Timer();
+                task = new LotterieTask();
+                t.schedule(task, getNextDrawingTime());
+            }
         }
         else {
-            log.warning("Can't connect to Database!");
+            log.printWarning("Can't connect to Database!");
         }
     }
 
     public void onDisable() {
-        log.info("[MiestarLotterie] disabled");
+        log.printInfo("[MiestarLotterie] disabled");
     }
 
     public void loadConfig() {
@@ -86,6 +99,7 @@ public class Main extends JavaPlugin {
     public void createConfig() {
         config.setProperty("drawing_of_lots", 1);
         config.setProperty("range_of_numbers", 9);
+        config.setProperty("automatically_drawing", true);
         config.setProperty("weekday_of_drawing", 7);// 1 = Montag, 2 = Dienstag,
                                                     // ... 7 = Sontag
         config.setProperty("time_of_drawin", 20);
@@ -96,5 +110,23 @@ public class Main extends JavaPlugin {
         config.setProperty("stake_ID", 266);
         config.setProperty("stake_name", "Gold");
         config.save();
+    }
+
+    public Date getNextDrawingTime() {
+        Calendar time = Calendar.getInstance();
+        long t = dbManager.loadTime();
+        if (t > 0) {
+            time.setTimeInMillis(t);
+        }
+        else {
+            time.set(Calendar.DAY_OF_WEEK,
+                    config.getInt("weekday_of_drawin", 7) + 1);
+            time.set(Calendar.HOUR_OF_DAY, config.getInt("time_of_drawin", 20));
+            time.set(Calendar.MINUTE, 0);
+            time.set(Calendar.SECOND, 0);
+        }
+        log.printInfo(String.format("Automatische ziehung um: %s ",
+                time.getTime()));
+        return time.getTime();
     }
 }
