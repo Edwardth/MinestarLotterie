@@ -104,8 +104,8 @@ public class Main extends JavaPlugin {
                                                    // ... 7 = Sontag
         config.addDefault("time_of_drawin", 20);
         config.addDefault("prize_value", 10);
-        config.addDefault("prize_ID", 264);
-        config.addDefault("prize_name", "Diamanten");
+        config.addDefault("prize_ID", 266);
+        config.addDefault("prize_name", "Gold");
         config.addDefault("stake_value", 1);
         config.addDefault("stake_ID", 266);
         config.addDefault("stake_name", "Gold");

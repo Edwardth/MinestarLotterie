@@ -20,7 +20,6 @@ package com.minestar.MinestarLotterie.dataManager;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.TreeMap;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -32,12 +31,10 @@ import com.minestar.MinestarLotterie.Main;
 public class DrawingManager {
     private final DatabaseManager dbManager;
 
-    private TreeMap<String, Integer> winner;
     private Random random;
 
     public DrawingManager(DatabaseManager dbManager) {
         this.dbManager = dbManager;
-        winner = this.dbManager.loadWinnerFromDatabase();
         random = new Random();
     }
 
@@ -52,35 +49,30 @@ public class DrawingManager {
     }
 
     public boolean isWinner(Player player) {
-        return winner.containsKey(player.getName());
+        return dbManager.isWinner(player.getName());
     }
 
     public void draw(boolean auto) {
-        int itemp = random.nextInt(Main.config.getInt("range_of_numbers",9));
-        draw(itemp,auto);
+        int itemp = random.nextInt(Main.config.getInt("range_of_numbers", 9));
+        draw(itemp, auto);
     }
 
-    public void draw(int itemp,boolean auto) {
+    public void draw(int itemp, boolean auto) {
         int prize = dbManager.loadPrize();
         int rest = 0;
         ArrayList<String> newWinner = dbManager.getNewWinner(itemp);
-        if(newWinner.isEmpty())
-        {
+        if (newWinner.isEmpty()) {
             Main.log.printInfo("Es gibt keinen gewinner");
             rest = prize;
         }
-        else
-        {
+        else {
             rest = prize % newWinner.size();
             prize = prize / newWinner.size();
-            for(String winner : newWinner)
-            {
-                if(dbManager.isWinner(winner))
-                {
+            for (String winner : newWinner) {
+                if (dbManager.isWinner(winner)) {
                     dbManager.updateWinner(winner, prize);
                 }
-                else
-                {
+                else {
                     dbManager.addWinner(winner, prize);
                 }
             }
@@ -91,13 +83,13 @@ public class DrawingManager {
 
     public void get(Player player) {
         String name = player.getName();
-        if (isWinner(player)) {
-            if (dbManager.deleteWinner(player.getName())) {
+        if (dbManager.isWinner(name)) {
+            int prize = dbManager.getPrizeForWinner(name);
+            if (dbManager.deleteWinner(name)) {
                 ItemStack itemstack = new ItemStack(Main.config.getInt(
-                        "prize_ID", 264), winner.get(name));
+                        "prize_ID", 264), prize);
                 player.getInventory().addItem(itemstack);
                 player.sendMessage("Hier dein Gewinn!");
-                winner.remove(player.getName());
                 return;
             }
             player.sendMessage(ChatColor.RED
@@ -105,14 +97,4 @@ public class DrawingManager {
         }
         player.sendMessage("Du hast leider nichts gewonnen");
     }
-
-    /*private String playersToString(ArrayList<String> players, String player) {
-        StringBuilder sb = new StringBuilder("");
-        for (int i = 0; i < players.size(); i++) {
-            sb.append(players.get(i));
-            sb.append(",");
-        }
-        sb.append(player);
-        return sb.toString();
-    }*/
 }

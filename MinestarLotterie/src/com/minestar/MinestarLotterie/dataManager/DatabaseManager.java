@@ -22,7 +22,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Date;
-import java.util.TreeMap;
 import java.util.ArrayList;
 
 import org.bukkit.Server;
@@ -77,6 +76,7 @@ public class DatabaseManager {
     private void initiate() throws Exception {
         // check the database structure
         createTables();
+        createNextDraw();
     }
 
     private void createTables() throws Exception {
@@ -107,25 +107,14 @@ public class DatabaseManager {
         con.commit();
     }
 
-    public TreeMap<String, Integer> loadWinnerFromDatabase() {
-
-        TreeMap<String, Integer> winner = new TreeMap<String, Integer>();
-        try {
-            ResultSet rs = con.createStatement().executeQuery(
-                    "SELECT player,value FROM winner");
-            while (rs.next()) {
-
-                String player = rs.getString(1);
-                int value = rs.getInt(2);
-                winner.put(player, value);
-            }
+    private void createNextDraw() throws Exception {
+        ResultSet rs = con.createStatement().executeQuery(
+                "SELECT id FROM nextdraw WHERE 1");
+        if (!rs.next()) {
+            con.createStatement().executeUpdate(
+                    "INSERT INTO nextdraw (id, time, prize) VALUES (1,0,0);");
+            con.commit();
         }
-        catch (Exception e) {
-            Main.log.printError(
-                    "Error while loading the winner from database!", e);
-        }
-        Main.log.printInfo("Loaded sucessfully " + winner.size() + " Winner");
-        return winner;
     }
 
     public long loadTime() {
@@ -256,6 +245,20 @@ public class DatabaseManager {
             Main.log.printError("Error while look if a player is a Winner", e);
         }
         return false;
+    }
+
+    public int getPrizeForWinner(String player) {
+        int prize = 0;
+        try {
+            ResultSet rs = con.createStatement().executeQuery(
+                    "SELECT value FROM winner WHERE player ='" + player + "'");
+            if (rs.next())
+                prize = rs.getInt(1);
+        }
+        catch (Exception e) {
+            Main.log.printError("Error while get the prize for a winner!", e);
+        }
+        return prize;
     }
 
     public boolean updateWinner(String player, int value) {

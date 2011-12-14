@@ -76,7 +76,8 @@ public class ConnectionManager {
                 instance = null;
             }
             catch (Exception e) {
-                Main.log.printError("Error while closing the database connection!",e);
+                Main.log.printError(
+                        "Error while closing the database connection!", e);
             }
         }
     }
@@ -95,7 +96,7 @@ public class ConnectionManager {
             instance.setAutoCommit(false);
         }
         catch (Exception e) {
-            Main.log.printError("Error while creating database connection!",e);
+            Main.log.printError("Error while creating database connection!", e);
             return false;
         }
         return true;

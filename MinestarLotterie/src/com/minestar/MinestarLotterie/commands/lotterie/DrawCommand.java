@@ -33,10 +33,12 @@ public class DrawCommand extends Command {
 
     public void execute(String[] args, Player player) {
         if (player.isOp()) {
-            // Drawing Befehl ausführen.
-            if (args.length == 1)
-                Main.drawingManager.draw(Integer.parseInt(args[0]),false);
-            //Main.drawingManager.draw(false);
+            if (args.length == 1) {
+                Main.drawingManager.draw(Integer.parseInt(args[0]), false);
+            }
+            else {
+                Main.drawingManager.draw(false);
+            }
             player.sendMessage("Manuelle Ziehung war erfolgreich.");
         }
         else {

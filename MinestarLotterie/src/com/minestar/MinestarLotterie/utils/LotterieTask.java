@@ -22,7 +22,7 @@ import java.util.TimerTask;
 
 import com.minestar.MinestarLotterie.Main;
 
-public class LotterieTask extends TimerTask{
+public class LotterieTask extends TimerTask {
 
     @Override
     public void run() {
