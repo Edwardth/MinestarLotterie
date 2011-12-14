@@ -26,10 +26,10 @@ import java.util.Timer;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.config.Configuration;
 
 import com.minestar.MinestarLotterie.dataManager.ConnectionManager;
 import com.minestar.MinestarLotterie.dataManager.DatabaseManager;
@@ -45,7 +45,7 @@ public class Main extends JavaPlugin {
     public static LogUnit log = LogUnit.getInstance(PLUGIN_NAME);
     private DatabaseManager dbManager;
     public static DrawingManager drawingManager;
-    public static Configuration config;
+    public static FileConfiguration config;
     private CommandList commandList;
     public static Server server;
     Timer t;
@@ -73,6 +73,7 @@ public class Main extends JavaPlugin {
     }
 
     public void onDisable() {
+        ConnectionManager.closeConnection();
         log.printInfo("[MiestarLotterie] disabled");
     }
 
@@ -82,12 +83,10 @@ public class Main extends JavaPlugin {
             pluginDir.mkdirs();
         File configFile = new File(pluginDir.getAbsolutePath().concat(
                 "/config.yml"));
-        config = new Configuration(new File(pluginDir.getAbsolutePath().concat(
-                "/config.yml")));
         if (!configFile.exists())
             createConfig();
         else
-            config.load();
+            config = getConfig();
     }
 
     public boolean onCommand(CommandSender sender, Command command,
@@ -97,19 +96,21 @@ public class Main extends JavaPlugin {
     }
 
     public void createConfig() {
-        config.setProperty("drawing_of_lots", 1);
-        config.setProperty("range_of_numbers", 9);
-        config.setProperty("automatically_drawing", true);
-        config.setProperty("weekday_of_drawing", 7);// 1 = Montag, 2 = Dienstag,
-                                                    // ... 7 = Sontag
-        config.setProperty("time_of_drawin", 20);
-        config.setProperty("prize_value", 10);
-        config.setProperty("prize_ID", 264);
-        config.setProperty("prize_name", "Diamanten");
-        config.setProperty("stake_value", 1);
-        config.setProperty("stake_ID", 266);
-        config.setProperty("stake_name", "Gold");
-        config.save();
+        config = getConfig();
+        config.addDefault("drawing_of_lots", 1);
+        config.addDefault("range_of_numbers", 9);
+        config.addDefault("automatically_drawing", true);
+        config.addDefault("weekday_of_drawing", 7);// 1 = Montag, 2 = Dienstag,
+                                                   // ... 7 = Sontag
+        config.addDefault("time_of_drawin", 20);
+        config.addDefault("prize_value", 10);
+        config.addDefault("prize_ID", 264);
+        config.addDefault("prize_name", "Diamanten");
+        config.addDefault("stake_value", 1);
+        config.addDefault("stake_ID", 266);
+        config.addDefault("stake_name", "Gold");
+        config.options().copyDefaults(true);
+        saveConfig();
     }
 
     public Date getNextDrawingTime() {

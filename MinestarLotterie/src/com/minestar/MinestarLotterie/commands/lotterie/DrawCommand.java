@@ -36,7 +36,7 @@ public class DrawCommand extends Command {
             // Drawing Befehl ausführen.
             if (args.length == 1)
                 Main.drawingManager.draw(Integer.parseInt(args[0]),false);
-            Main.drawingManager.draw(false);
+            //Main.drawingManager.draw(false);
             player.sendMessage("Manuelle Ziehung war erfolgreich.");
         }
         else {

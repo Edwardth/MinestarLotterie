@@ -31,43 +31,23 @@ import com.minestar.MinestarLotterie.Main;
 
 public class DrawingManager {
     private final DatabaseManager dbManager;
-    private ArrayList<String> currentusers;
-    //private TreeMap<Integer, ArrayList<String>> currentdrawing;
+
     private TreeMap<String, Integer> winner;
     private Random random;
 
     public DrawingManager(DatabaseManager dbManager) {
         this.dbManager = dbManager;
-        //StakesAndPlayer sap = this.dbManager.loadStakesAndPlayerFromDatabase();
-        //currentusers = sap.getPlayer();
-        //currentdrawing = sap.getStakes();
         winner = this.dbManager.loadWinnerFromDatabase();
         random = new Random();
     }
 
     public boolean addstake(Player player, int number) {
         String name = player.getName();
-        if (currentusers.contains(name)) {
+        if (dbManager.hasPlayerBet(name)) {
             player.sendMessage("Du kannst nur einmal pro Ziehung einen Tipp abgeben!");
             return false;
         }
         dbManager.addStake(name, number);
-        /*for (int i = 0; i < numbers.length; i++) {
-            if (!currentdrawing.containsKey(numbers[i])) {
-                if (dbManager.addStakes(numbers[i], name)) {
-                    ArrayList<String> temp = new ArrayList<String>();
-                    temp.add(name);
-                    currentdrawing.put(numbers[i], temp);
-                }
-            }
-            else {
-                if (dbManager.updateStakes(numbers[i],
-                        playersToString(currentdrawing.get(numbers[i]), name))) {
-                    currentdrawing.get(numbers[i]).add(name);
-                }
-            }
-        }*/
-        currentusers.add(name);
         return true;
     }
 
@@ -76,44 +56,37 @@ public class DrawingManager {
     }
 
     public void draw(boolean auto) {
-        int itemp = random.nextInt(10);
+        int itemp = random.nextInt(Main.config.getInt("range_of_numbers",9));
         draw(itemp,auto);
     }
 
     public void draw(int itemp,boolean auto) {
-        /*ArrayList<String> temp = new ArrayList<String>();
-        int prize = Main.config.getInt("prize_value", 10);
-        if (currentdrawing.containsKey(itemp)) {
-            temp = currentdrawing.get(itemp);
-            if (temp.isEmpty())
-                return;
-            Player player;
-            for (int i = 0; i < temp.size(); i++) {
-                if (winner.containsKey(temp.get(i))) {
-                    int oldprize = winner.get(temp.get(i));
-                    if (dbManager.updateWinner(temp.get(i), prize + oldprize)) {
-                        winner.put(temp.get(i), prize + oldprize);
-                        player = Main.server.getPlayer(temp.get(i));
-                        if (player != null)
-                            player.sendMessage(ChatColor.GOLD
-                                    + "Du hast wieder in der MinestarLotterie gewonnen!");
-                    }
+        int prize = dbManager.loadPrize();
+        int rest = 0;
+        ArrayList<String> newWinner = dbManager.getNewWinner(itemp);
+        if(newWinner.isEmpty())
+        {
+            Main.log.printInfo("Es gibt keinen gewinner");
+            rest = prize;
+        }
+        else
+        {
+            rest = prize % newWinner.size();
+            prize = prize / newWinner.size();
+            for(String winner : newWinner)
+            {
+                if(dbManager.isWinner(winner))
+                {
+                    dbManager.updateWinner(winner, prize);
                 }
-                else {
-                    if (dbManager.addWinner(temp.get(i), prize)) {
-                        winner.put(temp.get(i), prize);
-                        player = Main.server.getPlayer(temp.get(i));
-                        if (player != null)
-                            player.sendMessage(ChatColor.GOLD
-                                    + "Du hast in der MinestarLotterie gewonnen!");
-                    }
+                else
+                {
+                    dbManager.addWinner(winner, prize);
                 }
             }
         }
-        if (dbManager.deleteStakes()) {
-            currentdrawing.clear();
-            currentusers.clear();
-        }*/
+        dbManager.deleteStakes();
+        dbManager.updatePrize(rest);
     }
 
     public void get(Player player) {

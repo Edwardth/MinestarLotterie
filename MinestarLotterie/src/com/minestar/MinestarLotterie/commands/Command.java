@@ -22,7 +22,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 
-import com.gemo.utils.UtilPermissions;
+import com.bukkit.gemo.utils.UtilPermissions;
 
 public abstract class Command {
     public final Server server;
@@ -95,8 +95,7 @@ public abstract class Command {
         return UtilPermissions.playerCanUseCommand(player,
                 "minestarlotterie.command." + getPermissionNode());
     }
-    
-    
+
     /**
      * Compares the count of arguments has and the count of arguments the
      * command should have.

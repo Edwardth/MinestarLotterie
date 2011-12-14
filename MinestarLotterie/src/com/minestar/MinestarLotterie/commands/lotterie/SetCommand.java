@@ -33,21 +33,11 @@ public class SetCommand extends Command {
     }
 
     public void execute(String[] args, Player player) {
-        // int drawings = Main.config.getInt("drawing_of_lots", 1);
         int range = Main.config.getInt("range_of_numbers", 9);
         int stakeValue = Main.config.getInt("stake_value", 1);
         int stakeID = Main.config.getInt("stake_ID", 266);
         player.sendMessage("" + player.getItemInHand().getTypeId());
-        // int[] numbers = new int[drawings];
         int number;
-        /*
-         * for (int i = 0; i < drawings; i++) { try { numbers[i] =
-         * Integer.parseInt(args[i]); } catch (Exception e) {
-         * player.sendMessage("Der " + (i + 1) + ". Parameter ist keine Zahl!");
-         * return; } if (numbers[i] < 1 || numbers[i] > range) {
-         * player.sendMessage("Die Zahlen muessen zwischen 1 und " + range +
-         * " sein"); return; } }
-         */
         try {
             number = Integer.parseInt(args[0]);
         }
@@ -60,9 +50,10 @@ public class SetCommand extends Command {
                     + " liegen");
             return;
         }
-
         if (player.getItemInHand().getTypeId() == stakeID
                 && player.getItemInHand().getAmount() >= stakeValue) {
+            if (!Main.drawingManager.addstake(player, number))
+                return;
             if (player.getItemInHand().getAmount() == stakeValue) {
                 player.getInventory().clear(
                         player.getInventory().getHeldItemSlot());
@@ -79,15 +70,6 @@ public class SetCommand extends Command {
                     + " um ein Tipp abzugeben!");
             return;
         }
-        if (!Main.drawingManager.addstake(player, number))
-            return;
-
-        /*
-         * StringBuilder sb = new StringBuilder(""); for (int number : numbers)
-         * { sb.append(number); sb.append(", "); }
-         * player.sendMessage("Dein Tipp wurde erfolgreich abgegeben. " +
-         * sb.substring(0, sb.length() - 2));
-         */
         player.sendMessage("Dein Tipp wurde erfolgreich abgegeben. " + number);
         return;
     }
