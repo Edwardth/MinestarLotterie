@@ -121,10 +121,11 @@ public class Main extends JavaPlugin {
         }
         else {
             time.set(Calendar.DAY_OF_WEEK,
-                    config.getInt("weekday_of_drawin", 7) + 1);
+                    config.getInt("weekday_of_drawing", 7) + 1);
             time.set(Calendar.HOUR_OF_DAY, config.getInt("time_of_drawin", 20));
             time.set(Calendar.MINUTE, 0);
             time.set(Calendar.SECOND, 0);
+            dbManager.setTime(time.getTimeInMillis());
         }
         log.printInfo(String.format("Automatische ziehung um: %s ",
                 time.getTime()));

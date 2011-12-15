@@ -43,6 +43,8 @@ public class DatabaseManager {
     private PreparedStatement deleteWinner = null;
     private PreparedStatement addDrawing = null;
     private PreparedStatement updatePrize = null;
+    private PreparedStatement setPrize = null;
+    private PreparedStatement setTime = null;
 
     /**
      * Uses for all database transactions
@@ -66,7 +68,11 @@ public class DatabaseManager {
             addDrawing = con
                     .prepareStatement("INSERT INTO draws (time, number, auto, winner) VALUES (?,?,?,?);");
             updatePrize = con
+                    .prepareStatement("UPDATE nextdraw SET prize = prize + ? WHERE id = 1;");
+            setPrize = con
                     .prepareStatement("UPDATE nextdraw SET prize = ? WHERE id = 1;");
+            setTime = con
+                    .prepareStatement("UPDATE nextdraw SET time = ? WHERE id = 1;");
         }
         catch (Exception e) {
             Main.log.printError("Error while initiate of DatabaseManager!", e);
@@ -97,7 +103,7 @@ public class DatabaseManager {
                         + "`id` INTEGER PRIMARY KEY,"
                         + "`time` LONG NOT NULL DEFAULT '0',"
                         + "`number` INTEGER NOT NULL DEFAULT '0',"
-                        + "`auto` BOOLEAN DEFAULT TRUE," + "`winner` text);");
+                        + "`auto` BOOLEAN DEFAULT TRUE;");
         // create the table for storing the next draw-time and the prize;
         con.createStatement().executeUpdate(
                 "CREATE TABLE IF NOT EXISTS `nextdraw` ("
@@ -114,6 +120,17 @@ public class DatabaseManager {
             con.createStatement().executeUpdate(
                     "INSERT INTO nextdraw (id, time, prize) VALUES (1,0,0);");
             con.commit();
+        }
+    }
+
+    public void setTime(long time) {
+        try {
+            setTime.setLong(1, time);
+            setTime.executeUpdate();
+            con.commit();
+        }
+        catch (Exception e) {
+            Main.log.printError("Error while set the time in the database!", e);
         }
     }
 
@@ -136,7 +153,7 @@ public class DatabaseManager {
         int prize = 0;
         try {
             ResultSet rs = con.createStatement().executeQuery(
-                    "SELECT prize FROM nextdraw WHERE id='1'");
+                    "SELECT prize FROM nextdraw WHERE id=1");
             if (rs.next())
                 prize = rs.getInt(1);
         }
@@ -156,6 +173,17 @@ public class DatabaseManager {
         catch (Exception e) {
             Main.log.printError(
                     "Error while updateing the prize in the database!", e);
+        }
+    }
+
+    public void setPrize(int prize) {
+        try {
+            setPrize.setInt(1, prize);
+            setPrize.executeUpdate();
+            con.commit();
+        }
+        catch (Exception e) {
+            Main.log.printError("Error while set the prize in the database!", e);
         }
     }
 

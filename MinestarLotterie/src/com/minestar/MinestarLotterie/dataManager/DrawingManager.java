@@ -19,6 +19,7 @@
 package com.minestar.MinestarLotterie.dataManager;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Random;
 
 import org.bukkit.ChatColor;
@@ -44,6 +45,7 @@ public class DrawingManager {
             player.sendMessage("Du kannst nur einmal pro Ziehung einen Tipp abgeben!");
             return false;
         }
+        dbManager.updatePrize(Main.config.getInt("stake_value",1));
         dbManager.addStake(name, number);
         return true;
     }
@@ -77,8 +79,16 @@ public class DrawingManager {
                 }
             }
         }
+        if(auto)
+        {
+            Calendar c = Calendar.getInstance();
+            c.setTimeInMillis(dbManager.loadTime());
+            c.add(Calendar.DAY_OF_YEAR, 1);
+            c.set(Calendar.DAY_OF_WEEK, Main.config.getInt("weekday_of_drawing",7)+1);
+            dbManager.setTime(c.getTimeInMillis());
+        }
         dbManager.deleteStakes();
-        dbManager.updatePrize(rest);
+        dbManager.setPrize(rest);
     }
 
     public void get(Player player) {
