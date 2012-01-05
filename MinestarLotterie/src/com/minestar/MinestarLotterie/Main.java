@@ -53,10 +53,10 @@ public class Main extends JavaPlugin {
 
     public void onEnable() {
         if (ConnectionManager.initialize()) {
-            dbManager = new DatabaseManager(getServer());
+            dbManager = new DatabaseManager();
             drawingManager = new DrawingManager(dbManager);
-            commandList = new CommandList(getServer());
             server = getServer();
+            commandList = new CommandList(server);
             server.getPluginManager().registerEvent(Type.PLAYER_JOIN,
                     new PlayerJoinListener(), Priority.Normal, this);
             loadConfig();
@@ -97,18 +97,12 @@ public class Main extends JavaPlugin {
 
     public void createConfig() {
         config = getConfig();
-        config.addDefault("drawing_of_lots", 1);
         config.addDefault("range_of_numbers", 9);
         config.addDefault("automatically_drawing", true);
         config.addDefault("weekday_of_drawing", 7);// 1 = Montag, 2 = Dienstag,
                                                    // ... 7 = Sontag
         config.addDefault("time_of_drawin", 20);
-        config.addDefault("prize_value", 10);
-        config.addDefault("prize_ID", 266);
-        config.addDefault("prize_name", "Gold");
         config.addDefault("stake_value", 1);
-        config.addDefault("stake_ID", 266);
-        config.addDefault("stake_name", "Gold");
         config.options().copyDefaults(true);
         saveConfig();
     }

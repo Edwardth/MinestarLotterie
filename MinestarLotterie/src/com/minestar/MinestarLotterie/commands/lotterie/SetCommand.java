@@ -36,7 +36,6 @@ public class SetCommand extends Command {
         int range = Main.config.getInt("range_of_numbers", 9);
         int stakeValue = Main.config.getInt("stake_value", 1);
         int stakeID = Main.config.getInt("stake_ID", 266);
-        player.sendMessage("" + player.getItemInHand().getTypeId());
         int number;
         try {
             number = Integer.parseInt(args[0]);

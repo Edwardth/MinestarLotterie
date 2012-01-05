@@ -20,6 +20,7 @@ package com.minestar.MinestarLotterie.dataManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Random;
 
 import org.bukkit.ChatColor;
@@ -62,15 +63,20 @@ public class DrawingManager {
     public void draw(int itemp, boolean auto) {
         int prize = dbManager.loadPrize();
         int rest = 0;
-        ArrayList<String> newWinner = dbManager.getNewWinner(itemp);
+        Date date = new Date();
+        ArrayList<String> newWinner = dbManager.getNewWinner(itemp);        
         if (newWinner.isEmpty()) {
             Main.log.printInfo("Es gibt keinen gewinner");
             rest = prize;
+            dbManager.addDrawing(date.getTime(), itemp, auto, "NULL");
         }
         else {
             rest = prize % newWinner.size();
             prize = prize / newWinner.size();
             for (String winner : newWinner) {
+                Player player = Main.server.getPlayer(winner);
+                if(player != null)
+                    player.sendMessage(ChatColor.GOLD+"Du hast in der Lotterie gewonnen.");
                 if (dbManager.isWinner(winner)) {
                     dbManager.updateWinner(winner, prize);
                 }
@@ -78,6 +84,9 @@ public class DrawingManager {
                     dbManager.addWinner(winner, prize);
                 }
             }
+            String arrayname = "array"+date.getTime();
+            dbManager.addDrawing(date.getTime(), itemp, auto, arrayname);
+            dbManager.setArray(arrayname, newWinner);
         }
         if(auto)
         {
