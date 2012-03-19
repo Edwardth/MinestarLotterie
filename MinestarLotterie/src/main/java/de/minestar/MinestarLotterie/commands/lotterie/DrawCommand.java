@@ -16,33 +16,33 @@
  * along with MinestarLotterie.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.minestar.MinestarLotterie.commands.lotterie;
+package de.minestar.MinestarLotterie.commands.lotterie;
 
-import org.bukkit.Server;
 import org.bukkit.entity.Player;
 
-import com.minestar.MinestarLotterie.Main;
-import com.minestar.MinestarLotterie.commands.Command;
+import de.minestar.MinestarLotterie.dataManager.DrawingManager;
+import de.minestar.minestarlibrary.commands.AbstractCommand;
+import de.minestar.minestarlibrary.utils.PlayerUtils;
 
-public class DrawCommand extends Command {
-    public DrawCommand(String syntax, String arguments, String node,
-            Server server) {
-        super(syntax, arguments, node, server);
+public class DrawCommand extends AbstractCommand {
+    public DrawCommand(String syntax, String arguments, String node, DrawingManager drawingManager) {
+        super(syntax, arguments, node);
         this.description = "Zum bieten.";
+        this.drawingManager = drawingManager;
     }
+
+    private DrawingManager drawingManager;
 
     public void execute(String[] args, Player player) {
         if (player.isOp()) {
             if (args.length == 1) {
-                Main.drawingManager.draw(Integer.parseInt(args[0]), false);
+                drawingManager.draw(Integer.parseInt(args[0]), false);
+            } else {
+                drawingManager.draw(false);
             }
-            else {
-                Main.drawingManager.draw(false);
-            }
-            player.sendMessage("Manuelle Ziehung war erfolgreich.");
-        }
-        else {
-            player.sendMessage("Du bist nicht berechtigt diesen Befehl auszufuehren!");
+            PlayerUtils.sendInfo(player, "MinestarLotterie", "Manuelle Ziehung war erfolgreich.");
+        } else {
+            PlayerUtils.sendError(player, "MinestarLotterie", "Du bist nicht berechtigt diesen Befehl auszufuehren!");
         }
     }
 }

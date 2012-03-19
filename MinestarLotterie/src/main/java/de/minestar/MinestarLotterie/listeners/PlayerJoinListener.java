@@ -16,22 +16,27 @@
  * along with MinestarLotterie.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.minestar.MinestarLotterie.listeners;
+package de.minestar.MinestarLotterie.listeners;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerListener;
 
-import com.minestar.MinestarLotterie.Main;
+import de.minestar.MinestarLotterie.dataManager.DrawingManager;
+import de.minestar.minestarlibrary.utils.PlayerUtils;
 
-public class PlayerJoinListener extends PlayerListener {
-    @Override
+public class PlayerJoinListener implements Listener {
+    public PlayerJoinListener(DrawingManager drawingManager) {
+        this.drawingManager = drawingManager;
+    }
+
+    private DrawingManager drawingManager;
+
+    @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        if (Main.drawingManager.isWinner(player))
-            player.sendMessage(ChatColor.GOLD
-                    + "Herzlichen glückwunsch, du hast in der MinestarLotterie gewonnen");
-        // Wenn Player gewonnen hat gekommt er eine Message
+        if (drawingManager.isWinner(player.getName()))
+            PlayerUtils.sendSuccess(player, "MinestarLotterie", "Herzlichen glückwunsch, du hast in der MinestarLotterie gewonnen");
     }
 }

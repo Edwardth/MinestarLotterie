@@ -16,18 +16,24 @@
  * along with MinestarLotterie.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.minestar.MinestarLotterie.utils;
+package de.minestar.MinestarLotterie.utils;
 
 import java.util.TimerTask;
 
-import com.minestar.MinestarLotterie.Main;
+import de.minestar.MinestarLotterie.dataManager.DrawingManager;
+import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
 public class LotterieTask extends TimerTask {
 
+    public LotterieTask(DrawingManager drawingManager) {
+        this.drawingManager = drawingManager;
+    }
+
+    private DrawingManager drawingManager;
+
     @Override
     public void run() {
-        // TODO Auto-generated method stub
-        Main.drawingManager.draw(true);
-        Main.log.printInfo("Automatische Ziehung");
+        drawingManager.draw(true);
+        ConsoleUtils.printInfo("MinestarLotterie", "Automatische Ziehung wird ausgeführt.");
     }
 }

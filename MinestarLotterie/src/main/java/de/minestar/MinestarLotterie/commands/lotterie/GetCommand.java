@@ -16,22 +16,23 @@
  * along with MinestarLotterie.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.minestar.MinestarLotterie.commands.lotterie;
+package de.minestar.MinestarLotterie.commands.lotterie;
 
-import org.bukkit.Server;
 import org.bukkit.entity.Player;
 
-import com.minestar.MinestarLotterie.Main;
-import com.minestar.MinestarLotterie.commands.Command;
+import de.minestar.MinestarLotterie.dataManager.DrawingManager;
+import de.minestar.minestarlibrary.commands.AbstractCommand;
 
-public class GetCommand extends Command {
-    public GetCommand(String syntax, String arguments, String node,
-            Server server) {
-        super(syntax, arguments, node, server);
+public class GetCommand extends AbstractCommand {
+    public GetCommand(String syntax, String arguments, String node, DrawingManager drawingManager) {
+        super(syntax, arguments, node);
         this.description = "Zum bieten.";
+        this.drawingManager = drawingManager;
     }
 
+    private DrawingManager drawingManager;
+
     public void execute(String[] args, Player player) {
-        Main.drawingManager.get(player);
+        drawingManager.get(player);
     }
 }
